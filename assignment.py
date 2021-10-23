@@ -11,18 +11,25 @@ app = Flask(__name__)
 def home(): # main page
 	if request.method== "POST": # if requested search
 		name = request.form["search"] # get search input
-		url = "https://wikipedia.org/wiki/" + name # get requested URL
+		url = "https://wikipedia.org/wiki/" + name.replace(" ","_") # get requested URL
+		# .replace method is used for queries of more than one word
 
 		r = requests.get(url)
 
 		soup = BeautifulSoup(r.content, 'html5lib') # get all HTML of URL
 
-		# get all HTML of <div id='mw-content-text'>
-		paragraph = soup.find('div', attrs = {'id':'mw-content-text'}) 
+		# check if page exists
+		error = soup.find('div', attrs = {'id':'noarticletext_technical'})
+		if error: # if page not found
+			return  render_template("index.html", content = "Error! No page to display. Please try something else.")
+		else: # page is ready to display
+			# get all HTML of <div id='mw-content-text'>
+			paragraph = soup.find('div', attrs = {'id':'mw-content-text'}) 
 
-		# for finding first paragraph
-		p=paragraph.find("p", attrs={'class': None}) 
-		return  render_template("index.html", content = p.get_text('\n'))
+			# for finding first paragraph
+			p=paragraph.find("p", attrs={'class': None})
+			return  render_template("index.html", content = p.get_text())
+
 	else: # first call to index
 		return render_template("index.html", content = "")
 
