@@ -16,7 +16,7 @@ def home(): # main page
 
 		r = requests.get(url)
 
-		soup = BeautifulSoup(r.content, 'html5lib') # get all HTML of URL
+		soup = BeautifulSoup(r.content, 'html') # get all HTML of URL
 
 		# check if page exists
 		error = soup.find('div', attrs = {'id':'noarticletext_technical'})
